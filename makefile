@@ -41,7 +41,7 @@ all : lenny
 
 VERSION = $(VERSION_MJR).$(VERSION_MNR)
 
-lenny :
+lenny:
 	make -C src $(BUILD_RELEASE) VERSION_MJR=$(VERSION_MJR) VERSION_MNR=$(VERSION_MNR);
 
 clean:
@@ -57,7 +57,7 @@ clean:
 ## https://wiki.openssl.org/index.php/Compilation_and_Installation
 ##
 OPENSSL_VER = 1.1.1
-OPENSSL_VERSION = $(OPENSSL_VER)n
+OPENSSL_VERSION = $(OPENSSL_VER)u
 
 
 #
@@ -73,6 +73,16 @@ define SCRIPT_OPENSSL_BUILD_PI
 	rm openssl-$(OPENSSL_VERSION).tar.gz;
 endef
 
+
+define SCRIPT_OPENSSL_BUILD_LINUX
+	cd project; mkdir lib; cd lib; \
+	curl -O https://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz; \
+	tar -xvzf openssl-$(OPENSSL_VERSION).tar.gz; \
+	mv openssl-$(OPENSSL_VERSION) openssl; \
+	cd openssl; ./Configure linux-x86_64 -static; make; cd ..; \
+	rm openssl-$(OPENSSL_VERSION).tar.gz;
+endef
+
 define SCRIPT_OPENSSL_BUILD_DARWIN
 	cd project; mkdir lib; cd lib; \
 	curl -O https://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz; \
@@ -85,6 +95,9 @@ endef
 .PHONY : lib_openssl_setup
 lib_openssl:
 	$(SCRIPT_OPENSSL_BUILD_PI)
+
+lib_openssl_linux:
+	$(SCRIPT_OPENSSL_BUILD_LINUX)
 
 lib_openssl_darwin:
 	$(SCRIPT_OPENSSL_BUILD_DARWIN)
